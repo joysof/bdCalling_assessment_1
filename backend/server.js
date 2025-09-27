@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import dotenv from 'dotenv'
 import connectDB from './config/BD.js'
 import userRouter from './routes/user.routes.js'
+import userAuth from './middleware/user.middleware.js'
 dotenv.config()
 
 
@@ -23,6 +24,7 @@ connectDB()
 
 // api end point 
 app.use('/api/user' , userRouter)
+
 app.listen(port ,() =>{
     console.log(`your server is runnig at localhost:${port}`)
 })

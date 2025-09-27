@@ -3,7 +3,7 @@
 import mongoose  from "mongoose";
 import bcrypt from 'bcryptjs'
 import User from "../models/user.models.js";
-
+import jwt from 'jsonwebtoken'
 const registion = async (req,res) =>{
     try {
         const { firstName, lastName, email, number, password, confirmPassword, termsAndCondition } = req.body;
@@ -48,11 +48,36 @@ const login = async(req,res) =>{
         if(!isMatch) {
             res.status(400).json({message : "Invalit password"})
         }
-        res.status(200).json({message: "login successful"})
+        const token = jwt.sign(
+            {id: user._id , email: user.email},
+            process.env.JWT_SECRET,
+            {expiresIn : process.env.JWT_EXPIRE}
+        )
+        res.status(200).json({
+            message: "login successful",
+            token,
+            user :{
+                id : user._id,
+                firstName : user.firstName,
+                lastName : user.lastName,
+                email  : user.email,
+                number : user.number
+            }
+        })
     } catch (error) {
         console.log(error)
         res.status(500).json({message : error.message})
     }
 
 }
-export  {registion ,login}
+
+const getProfile = async (req,res) =>{
+    try {
+     const user = await User.findById(req.user._id)
+        res.json({success :true , user})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({success : false , message:error.message})
+    }
+}
+export  {registion ,login ,getProfile}
